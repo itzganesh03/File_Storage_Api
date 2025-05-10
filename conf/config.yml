@@ -1,14 +1,20 @@
-# Server Configuration
 server:
   port: 8080
   host: "localhost"
 
-# JWT Configuration
+api:
+  Register: "/register"
+  Login: "/login"
+  Me: "/me"
+  Files_Upload: "/files/upload"
+  FileList: "/files/list"
+  RemmainingStorage: "/storage/remaining"
+
+
 jwt:
   secret: "qZqtnO9kFnhD2LJKsbtZLwRuFZzVv4UwNILfRYXaLa8="
   expiration_hours: 24
 
-# Storage Configuration
 storage:
   path: "./storage"
   max_per_user: 104857600  # 100MB in bytes

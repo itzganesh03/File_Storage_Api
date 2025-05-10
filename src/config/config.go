@@ -13,12 +13,20 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// Config holds all application configuration
 type Config struct {
 	Server struct {
 		Port int    `yaml:"port"`
 		Host string `yaml:"host"`
 	} `yaml:"server"`
+
+	API struct {
+		Register          string `yaml:"Register"`
+		Login             string `yaml:"Login"`
+		Me                string `yaml:"Me"`
+		Files_Upload      string `yaml:"Files_Upload"`
+		FileList          string `yaml:"FileList"`
+		RemmainingStorage string `yaml:"RemmainingStorage"`
+	} `yaml:"api"`
 
 	JWT struct {
 		Secret          string `yaml:"secret"`
@@ -43,34 +51,27 @@ type Config struct {
 // Global configuration
 var AppConfig Config
 
-// LoadConfig loads application configuration from YAML file
 func LoadConfig(configPath string) error {
-	// Use default config path if not provided
 	if configPath == "" {
 		configPath = constants.ConfigFilePath
 	}
 
-	// Normalize path separators for the current OS
 	configPath = filepath.FromSlash(configPath)
 
-	// Read config file
 	data, err := ioutil.ReadFile(configPath)
 	fmt.Println("Config file path:", configPath)
 	if err != nil {
 		return fmt.Errorf("error reading config file: %v", err)
 	}
 
-	// Parse YAML
 	if err := yaml.Unmarshal(data, &AppConfig); err != nil {
 		return fmt.Errorf("error parsing config: %v", err)
 	}
 
-	// Create storage directory if it doesn't exist
 	if err := os.MkdirAll(AppConfig.Storage.Path, 0755); err != nil {
 		return fmt.Errorf("could not create storage directory: %v", err)
 	}
 
-	// Set defaults if values are missing
 	if AppConfig.Server.Port == 0 {
 		AppConfig.Server.Port = 8080
 	}
@@ -93,11 +94,9 @@ func LoadConfig(configPath string) error {
 	}
 
 	if AppConfig.Storage.Path == "" {
-		// Default to ./storage
 		AppConfig.Storage.Path = filepath.Join(".", "storage")
 	}
 
-	// MongoDB defaults
 	if AppConfig.MongoDB.URI == "" {
 		AppConfig.MongoDB.URI = "mongodb://localhost:27017"
 	}
@@ -117,57 +116,71 @@ func LoadConfig(configPath string) error {
 	return nil
 }
 
-// GetServerAddress returns the formatted server address (host:port)
 func GetServerAddress() string {
 	return fmt.Sprintf("%s:%d", AppConfig.Server.Host, AppConfig.Server.Port)
 }
 
-// GetStoragePath returns the configured storage path
 func GetStoragePath() string {
 	return AppConfig.Storage.Path
 }
 
-// GetJWTSecret returns the configured JWT secret
 func GetJWTSecret() string {
 	return AppConfig.JWT.Secret
 }
 
-// GetMaxStoragePerUser returns the maximum storage allowed per user
 func GetMaxStoragePerUser() int64 {
 	return AppConfig.Storage.MaxPerUser
 }
 
-// GetMongoDBURI returns the MongoDB connection URI
 func GetMongoDBURI() string {
 	return AppConfig.MongoDB.URI
 }
 
-// GetMongoDBName returns the MongoDB database name
 func GetMongoDBName() string {
 	return AppConfig.MongoDB.Database
 }
 
-// GetMongoDBUsersCollection returns the MongoDB users collection name
 func GetMongoDBUsersCollection() string {
 	return AppConfig.MongoDB.Collections.Users
 }
 
-// GetMongoDBFilesCollection returns the MongoDB files collection name
 func GetMongoDBFilesCollection() string {
 	return AppConfig.MongoDB.Collections.Files
 }
 
-// GetDisplayInMB returns whether storage should be displayed in MB
 func GetDisplayInMB() bool {
 	return AppConfig.Storage.DisplayInMB
 }
 
-// FormatStorageSize formats storage size according to configuration (MB or bytes)
 func FormatStorageSize(sizeInBytes int64) float64 {
 	if AppConfig.Storage.DisplayInMB {
-		// Convert bytes to MB and round to 2 decimal places
 		mbValue := float64(sizeInBytes) / 1024 / 1024
-		return math.Round(mbValue*100) / 100 // Round to 2 decimal places
+		return math.Round(mbValue*100) / 100
 	}
 	return float64(sizeInBytes)
+}
+
+// API endpoint getters
+func GetRegisterEndpoint() string {
+	return AppConfig.API.Register
+}
+
+func GetLoginEndpoint() string {
+	return AppConfig.API.Login
+}
+
+func GetMeEndpoint() string {
+	return AppConfig.API.Me
+}
+
+func GetFilesUploadEndpoint() string {
+	return AppConfig.API.Files_Upload
+}
+
+func GetFileListEndpoint() string {
+	return AppConfig.API.FileList
+}
+
+func GetRemainingStorageEndpoint() string {
+	return AppConfig.API.RemmainingStorage
 }
