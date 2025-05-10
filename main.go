@@ -3,15 +3,16 @@ package main
 import (
 	"log"
 
-	"github.com/yourusername/file-storage-api/src/config"
-	"github.com/yourusername/file-storage-api/src/models"
-	"github.com/yourusername/file-storage-api/src/router"
-	"github.com/yourusername/file-storage-api/src/storage"
+	"file-storage-api/src/config"
+	"file-storage-api/src/constants"
+	"file-storage-api/src/models"
+	"file-storage-api/src/router"
+	"file-storage-api/src/storage"
 )
 
 func main() {
 	// Load YAML configuration
-	if err := config.LoadConfig("config.yml"); err != nil {
+	if err := config.LoadConfig(constants.ConfigFilePath); err != nil {
 		log.Fatalf("Failed to load configuration: %v", err)
 	}
 

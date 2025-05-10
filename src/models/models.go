@@ -10,8 +10,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/yourusername/file-storage-api/src/config"
-	"github.com/yourusername/file-storage-api/src/constants"
+	"file-storage-api/src/config"
+	"file-storage-api/src/constants"
 )
 
 // User represents a user in the system

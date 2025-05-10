@@ -5,9 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/yourusername/file-storage-api/src/auth"
-	"github.com/yourusername/file-storage-api/src/constants"
-	"github.com/yourusername/file-storage-api/src/models"
+	"file-storage-api/src/auth"
+	"file-storage-api/src/constants"
+	"file-storage-api/src/models"
 )
 
 // AuthHandler handles authentication related endpoints

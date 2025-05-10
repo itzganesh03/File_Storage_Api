@@ -9,9 +9,9 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
-	"github.com/yourusername/file-storage-api/src/config"
-	"github.com/yourusername/file-storage-api/src/constants"
-	"github.com/yourusername/file-storage-api/src/models"
+	"file-storage-api/src/config"
+	"file-storage-api/src/constants"
+	"file-storage-api/src/models"
 )
 
 // FileService manages file storage operations
@@ -48,6 +48,15 @@ func (s *FileService) UploadFile(userID primitive.ObjectID, fileName string, fil
 	user, err := models.GetUserByID(userID)
 	if err != nil {
 		return nil, errors.New(constants.MessageUserNotFound)
+	}
+
+	// Check if file with the same name already exists for this user
+	exists, err := models.FileExistsByName(userID, fileName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to check for duplicate files: %w", err)
+	}
+	if exists {
+		return nil, errors.New(constants.MessageFileDuplicate)
 	}
 
 	// Create user directory if it doesn't exist

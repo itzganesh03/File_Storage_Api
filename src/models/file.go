@@ -8,9 +8,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/yourusername/file-storage-api/src/config"
-	"github.com/yourusername/file-storage-api/src/constants"
+	"file-storage-api/src/config"
+	"file-storage-api/src/constants"
 )
 
 // FileMetadata represents metadata for a stored file
@@ -85,6 +86,40 @@ func GetFilesByUserID(userID primitive.ObjectID) ([]*FileMetadata, error) {
 	return files, nil
 }
 
+// GetFilesByUserIDPaginated lists files for a given user with pagination
+func GetFilesByUserIDPaginated(userID primitive.ObjectID, page, pageSize int) ([]*FileMetadata, int64, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// Calculate skip value based on page and pageSize
+	skip := (page - 1) * pageSize
+
+	// Get total count of files for pagination metadata
+	totalCount, err := fileCollection.CountDocuments(ctx, bson.M{"user_id": userID})
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// Find files with pagination
+	findOptions := options.Find()
+	findOptions.SetSkip(int64(skip))
+	findOptions.SetLimit(int64(pageSize))
+	findOptions.SetSort(bson.D{{Key: "created_at", Value: -1}}) // Sort by newest first
+
+	cursor, err := fileCollection.Find(ctx, bson.M{"user_id": userID}, findOptions)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer cursor.Close(ctx)
+
+	var files []*FileMetadata
+	if err = cursor.All(ctx, &files); err != nil {
+		return nil, 0, err
+	}
+
+	return files, totalCount, nil
+}
+
 // GetFileByID retrieves a file by its ID
 func GetFileByID(fileID, userID primitive.ObjectID) (*FileMetadata, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -125,4 +160,21 @@ func DeleteFileMetadata(fileID, userID primitive.ObjectID) error {
 	}
 
 	return nil
+}
+
+// FileExistsByName checks if a file with the given name already exists for the user
+func FileExistsByName(userID primitive.ObjectID, fileName string) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// Count files with the same name for this user
+	count, err := fileCollection.CountDocuments(ctx, bson.M{
+		"user_id":   userID,
+		"file_name": fileName,
+	})
+	if err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
 }

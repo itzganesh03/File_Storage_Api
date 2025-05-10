@@ -1,15 +1,17 @@
 package handlers
 
 import (
+	"math"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
-	"github.com/yourusername/file-storage-api/src/config"
-	"github.com/yourusername/file-storage-api/src/constants"
-	"github.com/yourusername/file-storage-api/src/models"
-	"github.com/yourusername/file-storage-api/src/storage"
+	"file-storage-api/src/config"
+	"file-storage-api/src/constants"
+	"file-storage-api/src/models"
+	"file-storage-api/src/storage"
 )
 
 // FileHandler handles file operations
@@ -74,19 +76,45 @@ func (h *FileHandler) UploadFile(c *gin.Context) {
 	c.JSON(http.StatusCreated, response)
 }
 
-// ListFiles lists all files for the current user
+// ListFiles lists all files for the current user with pagination support
 func (h *FileHandler) ListFiles(c *gin.Context) {
 	userID, _ := c.Get("userID")
 	userIDObj := userID.(primitive.ObjectID)
-	files, err := models.GetFilesByUserID(userIDObj)
+
+	// Parse pagination parameters
+	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if err != nil || page < 1 {
+		page = 1
+	}
+
+	pageSize, err := strconv.Atoi(c.DefaultQuery("page_size", "10"))
+	if err != nil || pageSize < 1 || pageSize > 100 {
+		pageSize = 10 // Default page size
+	}
+
+	// Get files with pagination
+	files, totalCount, err := models.GetFilesByUserIDPaginated(userIDObj, page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse{Error: "Failed to list files"})
 		return
 	}
 
+	// Calculate pagination metadata
+	totalPages := int(math.Ceil(float64(totalCount) / float64(pageSize)))
+	hasNextPage := page < totalPages
+	hasPrevPage := page > 1
 	response := gin.H{
 		"files": files,
-	} // Add unit information if configured to display in MB
+		"pagination": gin.H{
+			"total_items":  totalCount,
+			"total_pages":  totalPages,
+			"current_page": page,
+			"page_size":    pageSize,
+			"has_next":     hasNextPage,
+			"has_prev":     hasPrevPage,
+		},
+	}
+	// Add unit information if configured to display in MB
 	if config.GetDisplayInMB() {
 		response["unit"] = "MB"
 		// Format file sizes if display in MB is enabled

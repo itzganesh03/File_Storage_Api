@@ -8,6 +8,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"file-storage-api/src/constants"
+
 	"gopkg.in/yaml.v3"
 )
 
@@ -45,11 +47,15 @@ var AppConfig Config
 func LoadConfig(configPath string) error {
 	// Use default config path if not provided
 	if configPath == "" {
-		configPath = "config.yml"
+		configPath = constants.ConfigFilePath
 	}
+
+	// Normalize path separators for the current OS
+	configPath = filepath.FromSlash(configPath)
 
 	// Read config file
 	data, err := ioutil.ReadFile(configPath)
+	fmt.Println("Config file path:", configPath)
 	if err != nil {
 		return fmt.Errorf("error reading config file: %v", err)
 	}

@@ -11,6 +11,7 @@ const (
 	MessageFileUploaded         = "File uploaded successfully"
 	MessageFileDeleted          = "File deleted successfully"
 	MessageFileNotFound         = "File not found"
+	MessageFileDuplicate        = "File with the same name already exists"
 	MessageStorageLimitExceeded = "Storage limit exceeded"
 	MessageInvalidToken         = "Invalid or expired token"
 	MessageUnauthorized         = "Unauthorized access"
@@ -20,9 +21,9 @@ const (
 // Default values
 const (
 	DefaultStoragePerUser = 104857600 // 100MB in bytes
-	DefaultJWTExpiration  = 24        // hours
-	DefaultPort           = 8080
+	DefaultJWTExpiration  = 24        // hours	DefaultPort           = 8080
 	DefaultHost           = "localhost"
+	ConfigFilePath        = "conf/config.yml"
 )
 
 // Header constants

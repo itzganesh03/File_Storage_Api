@@ -5,7 +5,7 @@ server:
 
 # JWT Configuration
 jwt:
-  secret: "your-secret-key-here"
+  secret: "qZqtnO9kFnhD2LJKsbtZLwRuFZzVv4UwNILfRYXaLa8="
   expiration_hours: 24
 
 # Storage Configuration

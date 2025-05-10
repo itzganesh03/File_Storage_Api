@@ -4,13 +4,13 @@ import (
 	"errors"
 	"time"
 
+	"file-storage-api/src/config"
+	"file-storage-api/src/constants"
+	"file-storage-api/src/models"
+
 	"github.com/golang-jwt/jwt/v5"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
-
-	"github.com/yourusername/file-storage-api/src/config"
-	"github.com/yourusername/file-storage-api/src/constants"
-	"github.com/yourusername/file-storage-api/src/models"
 )
 
 // JWT claims structure

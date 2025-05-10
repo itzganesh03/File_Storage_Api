@@ -3,12 +3,15 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 
-	"github.com/yourusername/file-storage-api/src/handlers"
-	"github.com/yourusername/file-storage-api/src/storage"
+	"file-storage-api/src/handlers"
+	"file-storage-api/src/storage"
 )
 
 // SetupRouter sets up the API routes
 func SetupRouter(fileService *storage.FileService) *gin.Engine {
+	// Set Gin to release mode to suppress debug output
+	gin.SetMode(gin.ReleaseMode)
+
 	router := gin.Default()
 
 	// Create handlers

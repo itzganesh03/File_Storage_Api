@@ -1,0 +1,4 @@
+
+# Storage directories containing user uploads
+/storage/
+/storage/*
