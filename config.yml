@@ -1,0 +1,23 @@
+# Server Configuration
+server:
+  port: 8080
+  host: "localhost"
+
+# JWT Configuration
+jwt:
+  secret: "your-secret-key-here"
+  expiration_hours: 24
+
+# Storage Configuration
+storage:
+  path: "./storage"
+  max_per_user: 104857600  # 100MB in bytes
+  display_in_mb: true     # Set to true to display storage values in MB instead of bytes
+
+# MongoDB Configuration
+mongodb:
+  uri: "mongodb+srv://EasyFresh:uYM27iKwl784AcXE@cluster0.oltgf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+  database: "File_Storage"
+  collections:
+    users: "Go_users"
+    files: "Go_files"
